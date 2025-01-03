@@ -1,17 +1,17 @@
-## TypeScript Playground Plugin
+## Shareable Twoslash Comments
 
-My new plugin for the TypeScript playground.
+A TypeScript Playground plugin that embeds twoslash (// ^?) type hints as literal comments in your code, making them easy to copy and share.
 
 ## Running this plugin
 
-- [Click this link](https://www.typescriptlang.org/play?install-plugin=[name]) to install
+- [Click this link](https://www.typescriptlang.org/play?install-plugin=shareable-twoslash-comments) to install
 
 or
 
 - Open up the TypeScript Playground
 - Go the "Plugins" in the sidebar
 - Look for "Plugins from npm"
-- Add "[name]"
+- Add "shareable-twoslash-comments"
 - Reload the browser
 
 Then it will show up as a tab in the sidebar.
