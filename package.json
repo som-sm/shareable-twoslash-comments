@@ -1,6 +1,6 @@
 {
   "name": "shareable-twoslash-comments",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/index.js",
   "description": "A TypeScript Playground plugin that embeds twoslash (// ^?) type hints as literal comments in your code, making them easy to copy and share.",
   "license": "MIT",
