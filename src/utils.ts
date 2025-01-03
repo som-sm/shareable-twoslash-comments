@@ -1,6 +1,6 @@
 import { Sandbox } from "./vendor/sandbox";
 
-const twoSlashQueryRegex = /(^\s*)(\/\/\s*\^\?)/gm;
+const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
 
 export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
   const multilineEnabled =
@@ -32,7 +32,7 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
 
     const quickInfoComment = `${match[0]} ${
       multilineEnabled
-        ? quickInfoString.replace(/\n/g, `\n${commentPrefix}`)
+        ? quickInfoString.replace(/\r?\n/g, model.getEOL() + commentPrefix)
         : quickInfoString.replace(/\r?\n\s*/g, " ")
     }`;
 
@@ -85,5 +85,5 @@ const getPreviousQuickInfoComment: GetPreviousQuickInfo = ({
     prevQuickInfoLines.push(lineContent);
   }
 
-  return prevQuickInfoLines.join("\n");
+  return prevQuickInfoLines.join(model.getEOL());
 };
