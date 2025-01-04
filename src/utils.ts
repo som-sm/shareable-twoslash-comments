@@ -24,11 +24,7 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
       quickInfoOffset,
     );
 
-    if (!quickInfo?.displayParts) {
-      continue;
-    }
-
-    const quickInfoString = quickInfo.displayParts.map((d) => d.text).join("");
+    const quickInfoString = quickInfo?.displayParts?.map((d) => d.text).join("") ?? "";
 
     const quickInfoComment = `${match[0]} ${
       multilineEnabled
