@@ -7,6 +7,15 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
   const model = sandbox.getModel();
   const worker = await sandbox.getWorkerProcess();
+
+  const diagnostics = await Promise.all([
+    worker.getSyntacticDiagnostics("file://" + model.uri.path),
+    worker.getSemanticDiagnostics("file://" + model.uri.path),
+  ]);
+  if (diagnostics.flat().length > 0) {
+    return;
+  }
+
   const text = model.getValue();
   const editOperations: import("monaco-editor").editor.IIdentifiedSingleEditOperation[] = [];
 
