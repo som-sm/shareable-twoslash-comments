@@ -96,3 +96,21 @@ const getPreviousQuickInfoComment: GetPreviousQuickInfo = ({
 
   return prevQuickInfoLines.join(model.getEOL());
 };
+
+export const debounce = <Fn extends (...args: any[]) => any>(
+  callback: Fn,
+  delay: number = 1000,
+): ((...args: Parameters<Fn>) => void) => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  return (...args: Parameters<Fn>): void => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(() => {
+      callback(...args);
+      timeoutId = undefined;
+    }, delay);
+  };
+};

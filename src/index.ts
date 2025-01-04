@@ -1,5 +1,7 @@
 import type { PlaygroundPlugin, PluginUtils } from "./vendor/playground";
-import { fillTwoSlashQueries } from "./utils";
+import { debounce, fillTwoSlashQueries } from "./utils";
+
+const debouncedFillTwoSlashQueries = debounce(fillTwoSlashQueries, 600);
 
 const makePlugin = (utils: PluginUtils) => {
   const customPlugin: PlaygroundPlugin = {
@@ -34,7 +36,7 @@ const makePlugin = (utils: PluginUtils) => {
     // because it is intentionally called at most once every 0.3 seconds
     // and then will always run at the end.
     modelChangedDebounce: async (sandbox, model) => {
-      fillTwoSlashQueries(sandbox);
+      debouncedFillTwoSlashQueries(sandbox);
     },
 
     // Gives you a chance to remove anything set up,
