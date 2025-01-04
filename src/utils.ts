@@ -63,7 +63,7 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
   }
 
   if (editOperations.length > 0) {
-    model.pushEditOperations([], editOperations, () => null);
+    model.applyEdits(editOperations);
   }
 };
 
