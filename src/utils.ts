@@ -69,12 +69,16 @@ const getPreviousQuickInfoComment: GetPreviousQuickInfo = ({
   lineNumber,
   commentPrefix,
 }) => {
-  const prevQuickInfoLines: string[] = [];
+  const prevQuickInfoLines: string[] = [model.getLineContent(lineNumber)];
 
-  for (let currLineNumber = lineNumber; currLineNumber <= model.getLineCount(); currLineNumber++) {
+  for (
+    let currLineNumber = lineNumber + 1;
+    currLineNumber <= model.getLineCount();
+    currLineNumber++
+  ) {
     const lineContent = model.getLineContent(currLineNumber);
 
-    if (!(lineContent.startsWith(commentPrefix) || lineContent.search(twoSlashQueryRegex) !== -1)) {
+    if (!lineContent.startsWith(commentPrefix)) {
       break;
     }
 
