@@ -1,7 +1,7 @@
 import type { PlaygroundPlugin, PluginUtils } from "./vendor/playground";
 import { debounce, fillTwoSlashQueries } from "./utils";
 
-const debouncedFillTwoSlashQueries = debounce(fillTwoSlashQueries, 600);
+const debouncedFillTwoSlashQueries = debounce(fillTwoSlashQueries, 500);
 
 const makePlugin = (utils: PluginUtils) => {
   const customPlugin: PlaygroundPlugin = {
