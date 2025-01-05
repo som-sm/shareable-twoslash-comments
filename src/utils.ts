@@ -37,7 +37,7 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
 
     const quickInfoString = quickInfo?.displayParts?.map((d) => d.text).join("") ?? "";
 
-    const quickInfoComment = `${match[0]} ${
+    const quickInfoComment = `${match[0]}${quickInfoString.length > 0 ? " " : ""}${
       multilineEnabled
         ? quickInfoString.replace(/\r?\n/g, model.getEOL() + commentPrefix)
         : truncate(
