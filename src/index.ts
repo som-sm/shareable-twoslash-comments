@@ -8,6 +8,7 @@ const makePlugin = (utils: PluginUtils) => {
     id: "shareable-twoslash-comments",
     displayName: "Shareable Twoslash Comments",
     data: { firstMount: true },
+    shouldBeSelected: () => true,
     didMount: (sandbox, container) => {
       // Create a design system object to handle
       // making DOM elements which fit the playground (and handle mobile/light/dark etc)
