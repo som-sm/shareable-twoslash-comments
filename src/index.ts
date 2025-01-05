@@ -24,6 +24,13 @@ const makePlugin = (utils: PluginUtils) => {
             display: "Enable multiline comments",
             onchange: () => fillTwoSlashQueries(sandbox),
           },
+          {
+            blurb:
+              "Prevent truncation of single line comments. Otherwise, they will be truncated to 100 characters.",
+            flag: "shareable-twoslash-comments/disable-truncation",
+            display: "Disable truncation",
+            onchange: () => fillTwoSlashQueries(sandbox),
+          },
         ],
         {
           style: "separated",

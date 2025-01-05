@@ -5,6 +5,8 @@ const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
 export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
   const multilineEnabled =
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
+  const truncationDisabled =
+    localStorage.getItem("shareable-twoslash-comments/disable-truncation") === "true";
   const model = sandbox.getModel();
   const worker = await sandbox.getWorkerProcess();
 
@@ -38,7 +40,10 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
     const quickInfoComment = `${match[0]} ${
       multilineEnabled
         ? quickInfoString.replace(/\r?\n/g, model.getEOL() + commentPrefix)
-        : quickInfoString.replace(/\r?\n\s*/g, " ")
+        : truncate(
+            quickInfoString.replace(/\r?\n\s*/g, " "),
+            truncationDisabled ? Number.POSITIVE_INFINITY : 100,
+          )
     }`;
 
     const prevQuickInfoComment = getPreviousQuickInfoComment({
@@ -114,3 +119,6 @@ export const debounce = <Fn extends (...args: any[]) => any>(
     }, delay);
   };
 };
+
+const truncate = (str: string, maxLength: number): string =>
+  str.length > maxLength ? str.slice(0, maxLength) + "…" : str;
