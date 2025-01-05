@@ -2,7 +2,7 @@
 
 A TypeScript Playground plugin that embeds twoslash (// ^?) type hints as literal comments in your code, making them easy to copy and share.
 
-https://github.com/user-attachments/assets/2224eec7-3011-4a08-b157-9eb6da700675
+https://github.com/user-attachments/assets/78243c42-a868-4ece-9815-e869a20e30b6
 
 ## Running this plugin
 
