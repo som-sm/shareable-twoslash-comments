@@ -7,6 +7,7 @@ const makePlugin = (utils: PluginUtils) => {
   const customPlugin: PlaygroundPlugin = {
     id: "shareable-twoslash-comments",
     displayName: "Shareable Twoslash Comments",
+    data: { firstMount: true },
     didMount: (sandbox, container) => {
       // Create a design system object to handle
       // making DOM elements which fit the playground (and handle mobile/light/dark etc)
@@ -36,14 +37,22 @@ const makePlugin = (utils: PluginUtils) => {
           style: "separated",
         },
       );
+
+      const model = sandbox.getModel();
+      if (customPlugin.data.firstMount) {
+        model.onDidChangeContent(() => {
+          debouncedFillTwoSlashQueries(sandbox);
+        });
+        customPlugin.data.firstMount = false;
+      }
     },
 
     // This is called occasionally as text changes in monaco,
     // it does not directly map 1 keyup to once run of the function
     // because it is intentionally called at most once every 0.3 seconds
     // and then will always run at the end.
-    modelChangedDebounce: async (sandbox, model) => {
-      debouncedFillTwoSlashQueries(sandbox);
+    modelChangedDebounce: async (_sandbox, _model) => {
+      // Do some work with the new text
     },
 
     // Gives you a chance to remove anything set up,
