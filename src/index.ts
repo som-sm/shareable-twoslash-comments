@@ -40,6 +40,7 @@ const makePlugin = (utils: PluginUtils) => {
 
       const model = sandbox.getModel();
       if (customPlugin.data.firstMount) {
+        debouncedFillTwoSlashQueries(sandbox);
         model.onDidChangeContent(() => {
           debouncedFillTwoSlashQueries(sandbox);
         });
