@@ -24,7 +24,24 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   for (const match of Array.from(text.matchAll(twoSlashQueryRegex))) {
     const commentPrefix = `${match[1]}//`.padEnd(match[0].length + 1);
 
-    const caretOffset = match.index + match[0].length - 1;
+    /**
+     * Zero-based index of the caret (`^`) position.
+     *
+     * @example
+     * ```markdown
+     * |  0 |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 |
+     * |  l |  e |  t |    |  f |  o |  o |    |  = |    |  5 |  ; | \n |
+     * | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+     * |    |    |  / |  / |    |    |  ^ |  ? |
+     * ```
+     * If the editor contains the above text, then the caret position would be `19`.
+     */
+    /* 
+     Calculation logic:
+     For the above example, `match.index` would be `13`, and `match[0].length` would be `8` (`13` to `20`).
+     So, subtracting `2` from the sum of these two values would give us the caret position i.e. `19`.
+     */
+    const caretOffset = match.index + match[0].length - 2;
     const caretPos = model.getPositionAt(caretOffset);
 
     const quickInfoPos = new sandbox.monaco.Position(caretPos.lineNumber - 1, caretPos.column);
