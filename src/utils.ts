@@ -2,7 +2,7 @@ import { Sandbox } from "./vendor/sandbox";
 
 const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
 
-export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
+export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   const multilineEnabled =
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
   const truncationDisabled =
@@ -70,19 +70,17 @@ export const fillTwoSlashQueries = async (sandbox: Sandbox): Promise<void> => {
   if (editOperations.length > 0) {
     model.applyEdits(editOperations);
   }
-};
+}
 
-type GetPreviousQuickInfo = (args: {
-  model: import("monaco-editor").editor.ITextModel;
-  lineNumber: number;
-  commentPrefix: string;
-}) => string;
-
-const getPreviousQuickInfoComment: GetPreviousQuickInfo = ({
+function getPreviousQuickInfoComment({
   model,
   lineNumber,
   commentPrefix,
-}) => {
+}: {
+  model: import("monaco-editor").editor.ITextModel;
+  lineNumber: number;
+  commentPrefix: string;
+}): string {
   const prevQuickInfoLines: string[] = [model.getLineContent(lineNumber)];
 
   for (
@@ -100,12 +98,12 @@ const getPreviousQuickInfoComment: GetPreviousQuickInfo = ({
   }
 
   return prevQuickInfoLines.join(model.getEOL());
-};
+}
 
-export const debounce = <Fn extends (...args: any[]) => any>(
+export function debounce<Fn extends (...args: any[]) => any>(
   callback: Fn,
   delay: number = 1000,
-): ((...args: Parameters<Fn>) => void) => {
+): (...args: Parameters<Fn>) => void {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   return (...args: Parameters<Fn>): void => {
@@ -118,7 +116,8 @@ export const debounce = <Fn extends (...args: any[]) => any>(
       timeoutId = undefined;
     }, delay);
   };
-};
+}
 
-const truncate = (str: string, maxLength: number): string =>
-  str.length > maxLength ? str.slice(0, maxLength) + "…" : str;
+function truncate(str: string, maxLength: number): string {
+  return str.length > maxLength ? str.slice(0, maxLength) + "…" : str;
+}
