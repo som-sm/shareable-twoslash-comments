@@ -7,15 +7,19 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
   const truncationDisabled =
     localStorage.getItem("shareable-twoslash-comments/disable-truncation") === "true";
+  const pauseOnError =
+    localStorage.getItem("shareable-twoslash-comments/pause-on-error") === "true";
   const model = sandbox.getModel();
   const worker = await sandbox.getWorkerProcess();
 
-  const diagnostics = await Promise.all([
-    worker.getSyntacticDiagnostics("file://" + model.uri.path),
-    worker.getSemanticDiagnostics("file://" + model.uri.path),
-  ]);
-  if (diagnostics.flat().length > 0) {
-    return;
+  if (pauseOnError) {
+    const diagnostics = await Promise.all([
+      worker.getSyntacticDiagnostics("file://" + model.uri.path),
+      worker.getSemanticDiagnostics("file://" + model.uri.path),
+    ]);
+    if (diagnostics.flat().length > 0) {
+      return;
+    }
   }
 
   const text = model.getValue();

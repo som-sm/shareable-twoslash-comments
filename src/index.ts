@@ -33,6 +33,12 @@ const makePlugin = (utils: PluginUtils) => {
             display: "Disable truncation",
             onchange: () => fillTwoSlashQueries(sandbox),
           },
+          {
+            blurb: "Pause comment generation if there are any errors in the code.",
+            flag: "shareable-twoslash-comments/pause-on-error",
+            display: "Pause on error",
+            onchange: () => fillTwoSlashQueries(sandbox),
+          },
         ],
         {
           style: "separated",
