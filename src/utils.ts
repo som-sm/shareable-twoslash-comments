@@ -12,6 +12,30 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   const model = sandbox.getModel();
   const worker = await sandbox.getWorkerProcess();
 
+  async function getLeftMostQuickInfo({
+    line,
+    column,
+  }: {
+    line: number;
+    column: number;
+  }): Promise<string> {
+    for (let col = column; col <= model.getLineContent(line).length; col++) {
+      const quickInfoPos = new sandbox.monaco.Position(line, col);
+      const quickInfoOffset = model.getOffsetAt(quickInfoPos);
+
+      const quickInfo = await worker.getQuickInfoAtPosition(
+        "file://" + model.uri.path,
+        quickInfoOffset,
+      );
+
+      if (quickInfo?.displayParts) {
+        return quickInfo.displayParts.map((d) => d.text).join("");
+      }
+    }
+
+    return "";
+  }
+
   if (pauseOnError) {
     const diagnostics = await Promise.all([
       worker.getSyntacticDiagnostics("file://" + model.uri.path),
@@ -49,15 +73,10 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
     const caretOffset = match.index + match[0].length - 2;
     const caretPos = model.getPositionAt(caretOffset);
 
-    const quickInfoPos = new sandbox.monaco.Position(caretPos.lineNumber - 1, caretPos.column);
-    const quickInfoOffset = model.getOffsetAt(quickInfoPos);
-
-    const quickInfo = await worker.getQuickInfoAtPosition(
-      "file://" + model.uri.path,
-      quickInfoOffset,
-    );
-
-    const quickInfoString = quickInfo?.displayParts?.map((d) => d.text).join("") ?? "";
+    const quickInfoString = await getLeftMostQuickInfo({
+      line: caretPos.lineNumber - 1,
+      column: caretPos.column,
+    });
 
     const quickInfoComment = `${match[0]}${quickInfoString.length > 0 ? " " : ""}${
       multilineEnabled
