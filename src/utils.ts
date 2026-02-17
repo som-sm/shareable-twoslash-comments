@@ -26,6 +26,7 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   const editOperations: import("monaco-editor").editor.IIdentifiedSingleEditOperation[] = [];
 
   for (const match of Array.from(text.matchAll(twoSlashQueryRegex))) {
+    // `match[1]` is the indent before the comment, and `match[0]` is the entire matched string (e.g. `    // ^?`).
     const commentPrefix = `${match[1]}//`.padEnd(match[0].length + 1);
 
     /**
