@@ -36,6 +36,32 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
     return "";
   }
 
+  function getPreviousQuickInfoComment({
+    lineNumber,
+    commentPrefix,
+  }: {
+    lineNumber: number;
+    commentPrefix: string;
+  }): string {
+    const prevQuickInfoLines: string[] = [model.getLineContent(lineNumber)];
+
+    for (
+      let currLineNumber = lineNumber + 1;
+      currLineNumber <= model.getLineCount();
+      currLineNumber++
+    ) {
+      const lineContent = model.getLineContent(currLineNumber);
+
+      if (!lineContent.startsWith(commentPrefix)) {
+        break;
+      }
+
+      prevQuickInfoLines.push(lineContent);
+    }
+
+    return prevQuickInfoLines.join(model.getEOL());
+  }
+
   if (pauseOnError) {
     const diagnostics = await Promise.all([
       worker.getSyntacticDiagnostics("file://" + model.uri.path),
@@ -88,7 +114,6 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
     }`;
 
     const prevQuickInfoComment = getPreviousQuickInfoComment({
-      model,
       lineNumber: caretPos.lineNumber,
       commentPrefix,
     });
@@ -111,34 +136,6 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   if (editOperations.length > 0) {
     model.applyEdits(editOperations);
   }
-}
-
-function getPreviousQuickInfoComment({
-  model,
-  lineNumber,
-  commentPrefix,
-}: {
-  model: import("monaco-editor").editor.ITextModel;
-  lineNumber: number;
-  commentPrefix: string;
-}): string {
-  const prevQuickInfoLines: string[] = [model.getLineContent(lineNumber)];
-
-  for (
-    let currLineNumber = lineNumber + 1;
-    currLineNumber <= model.getLineCount();
-    currLineNumber++
-  ) {
-    const lineContent = model.getLineContent(currLineNumber);
-
-    if (!lineContent.startsWith(commentPrefix)) {
-      break;
-    }
-
-    prevQuickInfoLines.push(lineContent);
-  }
-
-  return prevQuickInfoLines.join(model.getEOL());
 }
 
 export function debounce<Fn extends (...args: any[]) => any>(
