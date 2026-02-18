@@ -98,7 +98,7 @@ export async function fillTwoSlashQueries(
       queryType === "twoSlashArrowQuery" && textBeforeQuery.trim().length > 0;
 
     let lineNumber = model.getPositionAt(match.index).lineNumber;
-    let column = 1;
+    let column = model.getLineMinColumn(lineNumber);
 
     if (queryType === "twoSlashQuery") {
       /**
