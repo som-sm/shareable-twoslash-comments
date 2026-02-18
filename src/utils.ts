@@ -125,10 +125,12 @@ export async function fillTwoSlashQueries(
       column = caretPos.column;
     }
 
-    const quickInfoString = await getLeftMostQuickInfo({
-      line: lineNumber - (isInlineArrowQuery ? 0 : 1),
-      column,
-    });
+    const quickInfoLine = lineNumber - (isInlineArrowQuery ? 0 : 1);
+    if (quickInfoLine < 1) {
+      continue;
+    }
+
+    const quickInfoString = await getLeftMostQuickInfo({ line: quickInfoLine, column });
 
     const quickInfoComment = `${match[0]}${quickInfoString.length > 0 ? " " : ""}${
       multilineEnabled
