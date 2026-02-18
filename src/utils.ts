@@ -2,7 +2,10 @@ import { Sandbox } from "./vendor/sandbox";
 
 const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
 
-export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
+export async function fillTwoSlashQueries(
+  sandbox: Sandbox,
+  isUndoRedoChange: boolean = false,
+): Promise<void> {
   const multilineEnabled =
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
   const truncationDisabled =
@@ -134,7 +137,21 @@ export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   }
 
   if (editOperations.length > 0) {
-    model.applyEdits(editOperations);
+    if (!isUndoRedoChange) {
+      model.popStackElement();
+    }
+
+    try {
+      if (isUndoRedoChange) {
+        model.applyEdits(editOperations);
+      } else {
+        sandbox.editor.executeEdits("shareable-twoslash-comments", editOperations);
+      }
+    } finally {
+      if (!isUndoRedoChange) {
+        model.pushStackElement();
+      }
+    }
   }
 }
 

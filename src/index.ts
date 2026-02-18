@@ -48,8 +48,12 @@ const makePlugin = (utils: PluginUtils) => {
       const model = sandbox.getModel();
       if (customPlugin.data.firstMount) {
         debouncedFillTwoSlashQueries(sandbox);
-        model.onDidChangeContent(() => {
-          debouncedFillTwoSlashQueries(sandbox);
+        model.onDidChangeContent((e) => {
+          if (e.isRedoing || e.isUndoing) {
+            fillTwoSlashQueries(sandbox, true);
+          } else {
+            debouncedFillTwoSlashQueries(sandbox);
+          }
         });
         customPlugin.data.firstMount = false;
       }
