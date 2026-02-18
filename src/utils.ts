@@ -93,7 +93,7 @@ export async function fillTwoSlashQueries(
 
   for (const { match, queryType } of matches) {
     const textBeforeQuery = match[1];
-    const commentPrefix = `${"".repeat(textBeforeQuery.length)}//`.padEnd(match[0].length + 1);
+    const commentPrefix = `${" ".repeat(textBeforeQuery.length)}//`.padEnd(match[0].length + 1);
     const isInlineArrowQuery =
       queryType === "twoSlashArrowQuery" && textBeforeQuery.trim().length > 0;
 
