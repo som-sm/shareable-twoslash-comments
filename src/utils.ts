@@ -1,6 +1,7 @@
 import { Sandbox } from "./vendor/sandbox";
 
 const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
+const twoSlashArrowQueryRegex = /(^.*)\/\/=>/gm;
 
 export async function fillTwoSlashQueries(
   sandbox: Sandbox,
@@ -78,34 +79,58 @@ export async function fillTwoSlashQueries(
   const text = model.getValue();
   const editOperations: import("monaco-editor").editor.IIdentifiedSingleEditOperation[] = [];
 
-  for (const match of Array.from(text.matchAll(twoSlashQueryRegex))) {
-    // `match[1]` is the indent before the comment, and `match[0]` is the entire matched string (e.g. `    // ^?`).
-    const commentPrefix = `${match[1]}//`.padEnd(match[0].length + 1);
+  const matches = Array.from(text.matchAll(twoSlashQueryRegex))
+    .map((match) => ({
+      match,
+      queryType: "twoSlashQuery" as "twoSlashQuery" | "twoSlashArrowQuery",
+    }))
+    .concat(
+      Array.from(text.matchAll(twoSlashArrowQueryRegex)).map((match) => ({
+        match,
+        queryType: "twoSlashArrowQuery",
+      })),
+    );
 
-    /**
-     * Zero-based index of the caret (`^`) position.
-     *
-     * @example
-     * ```markdown
-     * |  0 |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 |
-     * |  l |  e |  t |    |  f |  o |  o |    |  = |    |  5 |  ; | \n |
-     * | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
-     * |    |    |  / |  / |    |    |  ^ |  ? |
-     * ```
-     * If the editor contains the above text, then the caret position would be `19`.
-     */
-    /* 
+  for (const { match, queryType } of matches) {
+    const textBeforeQuery = match[1];
+    const commentPrefix = `${" ".repeat(textBeforeQuery.length)}//`.padEnd(match[0].length + 1);
+    const isInlineArrowQuery =
+      queryType === "twoSlashArrowQuery" && textBeforeQuery.trim().length > 0;
+
+    let lineNumber = model.getPositionAt(match.index).lineNumber;
+    let column = model.getLineMinColumn(lineNumber);
+
+    if (queryType === "twoSlashQuery") {
+      /**
+       * Zero-based index of the caret (`^`) position.
+       *
+       * @example
+       * ```markdown
+       * |  0 |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 |
+       * |  l |  e |  t |    |  f |  o |  o |    |  = |    |  5 |  ; | \n |
+       * | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+       * |    |    |  / |  / |    |    |  ^ |  ? |
+       * ```
+       * If the editor contains the above text, then the caret position would be `19`.
+       */
+      /* 
      Calculation logic:
      For the above example, `match.index` would be `13`, and `match[0].length` would be `8` (`13` to `20`).
      So, subtracting `2` from the sum of these two values would give us the caret position i.e. `19`.
      */
-    const caretOffset = match.index + match[0].length - 2;
-    const caretPos = model.getPositionAt(caretOffset);
+      const caretOffset = match.index + match[0].length - 2;
+      const caretPos = model.getPositionAt(caretOffset);
 
-    const quickInfoString = await getLeftMostQuickInfo({
-      line: caretPos.lineNumber - 1,
-      column: caretPos.column,
-    });
+      lineNumber = caretPos.lineNumber;
+      column = caretPos.column;
+    }
+
+    const quickInfoLine = lineNumber - (isInlineArrowQuery ? 0 : 1);
+    if (quickInfoLine < 1) {
+      continue;
+    }
+
+    const quickInfoString = await getLeftMostQuickInfo({ line: quickInfoLine, column });
 
     const quickInfoComment = `${match[0]}${quickInfoString.length > 0 ? " " : ""}${
       multilineEnabled
@@ -116,17 +141,14 @@ export async function fillTwoSlashQueries(
           )
     }`;
 
-    const prevQuickInfoComment = getPreviousQuickInfoComment({
-      lineNumber: caretPos.lineNumber,
-      commentPrefix,
-    });
+    const prevQuickInfoComment = getPreviousQuickInfoComment({ lineNumber, commentPrefix });
     const prevQuickInfoLines = prevQuickInfoComment.split("\n").length;
-    const prevQuickInfoEndLine = caretPos.lineNumber + prevQuickInfoLines - 1;
+    const prevQuickInfoEndLine = lineNumber + prevQuickInfoLines - 1;
 
     if (prevQuickInfoComment !== quickInfoComment) {
       editOperations.push({
         range: new sandbox.monaco.Range(
-          caretPos.lineNumber,
+          lineNumber,
           0,
           prevQuickInfoEndLine,
           model.getLineContent(prevQuickInfoEndLine).length + 1,

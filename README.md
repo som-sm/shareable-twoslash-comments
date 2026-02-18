@@ -2,6 +2,21 @@
 
 A TypeScript Playground plugin that injects twoslash (// ^?) type hints as literal comments in your code, making them easy to copy and share.
 
+This plugin also supports twoslash arrow queries (`//=>`).
+
+If placed at the end of a line, it finds the first position on that line with type information and inserts it.
+
+```ts
+let foo = 1; //=> number
+```
+
+If placed on its own line, it looks at the previous line, finds the first position with type information, and inserts it.
+
+```ts
+let foo = 1;
+//=> number
+```
+
 https://github.com/user-attachments/assets/5e42a08e-7570-4d04-9434-6a93cd898e7f
 
 ## Running this plugin
