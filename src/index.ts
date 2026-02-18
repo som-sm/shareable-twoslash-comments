@@ -12,6 +12,29 @@ const makePlugin = (utils: PluginUtils) => {
     didMount: (sandbox, container) => {
       container.style.paddingRight = "8px";
 
+      const sponsorBanner = document.createElement("a");
+      sponsorBanner.href = "https://github.com/sponsors/som-sm";
+      sponsorBanner.target = "_blank";
+      sponsorBanner.rel = "noopener noreferrer";
+      sponsorBanner.textContent = "♡ Support this plugin";
+      Object.assign(sponsorBanner.style, {
+        display: "block",
+        paddingBottom: "8px",
+        borderBottom: "1px solid var(--border-color, rgba(128,128,128,0.2))",
+        color: "var(--text-color, inherit)",
+        textDecoration: "none",
+        textAlign: "right",
+        fontSize: "0.8em",
+        opacity: "0.6",
+      });
+      sponsorBanner.onmouseenter = () => {
+        sponsorBanner.style.opacity = "1";
+      };
+      sponsorBanner.onmouseleave = () => {
+        sponsorBanner.style.opacity = "0.6";
+      };
+      container.appendChild(sponsorBanner);
+
       // Create a design system object to handle
       // making DOM elements which fit the playground (and handle mobile/light/dark etc)
       const ds = utils.createDesignSystem(container);
