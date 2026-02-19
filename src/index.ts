@@ -62,6 +62,12 @@ const makePlugin = (utils: PluginUtils) => {
             onchange: () => fillTwoSlashQueries(sandbox),
           },
           {
+            blurb: "Generate shorter comments by inserting just the type.",
+            flag: "shareable-twoslash-comments/compact-output",
+            display: "Compact output",
+            onchange: () => fillTwoSlashQueries(sandbox),
+          },
+          {
             blurb:
               "Prevent truncation of single line comments. Otherwise, they will be truncated to 100 characters.",
             flag: "shareable-twoslash-comments/disable-truncation",

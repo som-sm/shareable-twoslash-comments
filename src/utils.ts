@@ -1,4 +1,5 @@
 import { Sandbox } from "./vendor/sandbox";
+import type { QuickInfo } from "typescript";
 
 const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
 const twoSlashArrowQueryRegex = /(^.*)\/\/=>/gm;
@@ -11,6 +12,8 @@ export async function fillTwoSlashQueries(
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
   const truncationDisabled =
     localStorage.getItem("shareable-twoslash-comments/disable-truncation") === "true";
+  const compactOutputEnabled =
+    localStorage.getItem("shareable-twoslash-comments/compact-output") === "true";
   const pauseOnError =
     localStorage.getItem("shareable-twoslash-comments/pause-on-error") === "true";
   const model = sandbox.getModel();
@@ -33,11 +36,54 @@ export async function fillTwoSlashQueries(
       );
 
       if (quickInfo?.displayParts) {
-        return quickInfo.displayParts.map((d) => d.text).join("");
+        return compactOutputEnabled
+          ? extractTypeFromDisplayParts(quickInfo.displayParts)
+          : quickInfo.displayParts.map(({ text }) => text).join("");
       }
     }
 
     return "";
+  }
+
+  function extractTypeFromDisplayParts(
+    displayParts: NonNullable<QuickInfo["displayParts"]>,
+  ): string {
+    // For interfaces and enums, return everything after the keyword.
+    const keywordIndex = displayParts.findIndex(
+      (part) => part.kind === "keyword" && ["interface", "enum"].includes(part.text),
+    );
+
+    if (keywordIndex !== -1) {
+      return displayParts
+        .slice(keywordIndex + 1)
+        .map((part) => part.text)
+        .join("")
+        .trim();
+    }
+
+    let depth = 0;
+    const separatorIndex = displayParts.findIndex((part) => {
+      if (part.kind === "punctuation") {
+        if (["(", "{", "<"].includes(part.text)) {
+          depth++;
+        } else if ([")", "}", ">"].includes(part.text)) {
+          depth--;
+        } else if (part.text === ":" && depth === 0) {
+          return true;
+        }
+      } else if (part.kind === "operator" && part.text === "=" && depth === 0) {
+        return true;
+      }
+
+      return false;
+    });
+
+    // If `separatorIndex` is `-1` (not found), return the entire thing.
+    return displayParts
+      .slice(separatorIndex + 1)
+      .map(({ text }) => text)
+      .join("")
+      .trim();
   }
 
   function getPreviousQuickInfoComment({ lineNumber }: { lineNumber: number }): string {
