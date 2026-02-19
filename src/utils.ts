@@ -40,13 +40,7 @@ export async function fillTwoSlashQueries(
     return "";
   }
 
-  function getPreviousQuickInfoComment({
-    lineNumber,
-    commentPrefix,
-  }: {
-    lineNumber: number;
-    commentPrefix: string;
-  }): string {
+  function getPreviousQuickInfoComment({ lineNumber }: { lineNumber: number }): string {
     const prevQuickInfoLines: string[] = [model.getLineContent(lineNumber)];
 
     for (
@@ -56,7 +50,17 @@ export async function fillTwoSlashQueries(
     ) {
       const lineContent = model.getLineContent(currLineNumber);
 
-      if (!lineContent.startsWith(commentPrefix)) {
+      /* 
+      Non-first lines in plugin generated comments are guaranteed to have 3 spaces after `//`.
+      ```
+      let foo = {bar: 1};
+      foo
+      //^? let foo: {
+      //       bar: number; [[ 3 spaces after `//` ]]
+      //   } [[ 3 spaces after `//` ]]
+      ```
+      */
+      if (!/^ *\/\/ {3}/.test(lineContent)) {
         break;
       }
 
@@ -141,7 +145,7 @@ export async function fillTwoSlashQueries(
           )
     }`;
 
-    const prevQuickInfoComment = getPreviousQuickInfoComment({ lineNumber, commentPrefix });
+    const prevQuickInfoComment = getPreviousQuickInfoComment({ lineNumber });
     const prevQuickInfoLines = prevQuickInfoComment.split("\n").length;
     const prevQuickInfoEndLine = lineNumber + prevQuickInfoLines - 1;
 
