@@ -164,10 +164,10 @@ export async function fillTwoSlashQueries(
        * If the editor contains the above text, then the caret position would be `19`.
        */
       /* 
-     Calculation logic:
-     For the above example, `match.index` would be `13`, and `match[0].length` would be `8` (`13` to `20`).
-     So, subtracting `2` from the sum of these two values would give us the caret position i.e. `19`.
-     */
+      Calculation logic:
+      For the above example, `match.index` would be `13`, and `match[0].length` would be `8` (`13` to `20`).
+      So, subtracting `2` from the sum of these two values would give us the caret position i.e. `19`.
+      */
       const caretOffset = match.index + match[0].length - 2;
       const caretPos = model.getPositionAt(caretOffset);
 
