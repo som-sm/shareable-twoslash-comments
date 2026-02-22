@@ -191,6 +191,8 @@ export async function fillTwoSlashQueries(
       quickInfoString = truncate(quickInfoString, 100);
     }
 
+    await (window as any).__shareableTwoslashComments_delayFunctionForTests?.();
+
     const quickInfoComment = match[0] + (quickInfoString.length > 0 ? " " : "") + quickInfoString;
 
     const prevQuickInfoComment = getPreviousQuickInfoComment({ lineNumber });

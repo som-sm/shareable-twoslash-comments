@@ -68,3 +68,10 @@ yarn-error.log
 # Yarn Integrity file
 .yarn-integrity
 dist
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
