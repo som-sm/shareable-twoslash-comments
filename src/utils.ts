@@ -18,6 +18,7 @@ export async function fillTwoSlashQueries(
     localStorage.getItem("shareable-twoslash-comments/pause-on-error") === "true";
   const model = sandbox.getModel();
   const worker = await sandbox.getWorkerProcess();
+  const versionId = model.getVersionId();
 
   async function getLeftMostQuickInfo({
     line,
@@ -206,6 +207,11 @@ export async function fillTwoSlashQueries(
         text: quickInfoComment,
       });
     }
+  }
+
+  if (model.getVersionId() !== versionId) {
+    console.log("Skipping stale edits");
+    return;
   }
 
   if (editOperations.length > 0) {
