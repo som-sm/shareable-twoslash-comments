@@ -115,7 +115,7 @@ const makePlugin = (utils: PluginUtils) => {
 
       const model = sandbox.getModel();
       if (customPlugin.data.firstMount) {
-        debouncedFillTwoSlashQueries(sandbox);
+        fillTwoSlashQueries(sandbox);
         model.onDidChangeContent((e) => {
           if (e.isRedoing || e.isUndoing) {
             fillTwoSlashQueries(sandbox, true);
