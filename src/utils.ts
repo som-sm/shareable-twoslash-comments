@@ -183,14 +183,15 @@ export async function fillTwoSlashQueries(
 
     const quickInfoString = await getLeftMostQuickInfo({ line: quickInfoLine, column });
 
-    const quickInfoComment = `${match[0]}${quickInfoString.length > 0 ? " " : ""}${
+    let quickInfoComment = `${match[0]}${quickInfoString.length > 0 ? " " : ""}${
       multilineEnabled
         ? quickInfoString.replace(/\r?\n/g, model.getEOL() + commentPrefix)
-        : truncate(
-            quickInfoString.replace(/\r?\n\s*/g, " "),
-            truncationDisabled ? Number.POSITIVE_INFINITY : 100,
-          )
+        : quickInfoString.replace(/\r?\n\s*/g, " ")
     }`;
+
+    if (!truncationDisabled && !quickInfoComment.includes("\n")) {
+      quickInfoComment = truncate(quickInfoComment, 100);
+    }
 
     const prevQuickInfoComment = getPreviousQuickInfoComment({ lineNumber });
     const prevQuickInfoLines = prevQuickInfoComment.split("\n").length;
