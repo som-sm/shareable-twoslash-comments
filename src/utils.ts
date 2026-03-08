@@ -201,7 +201,7 @@ export async function fillTwoSlashQueries(
       editOperations.push({
         range: new sandbox.monaco.Range(
           lineNumber,
-          0,
+          1,
           prevQuickInfoEndLine,
           model.getLineContent(prevQuickInfoEndLine).length + 1,
         ),
