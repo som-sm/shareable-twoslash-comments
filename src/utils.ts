@@ -4,10 +4,7 @@ import type { QuickInfo } from "typescript";
 const twoSlashQueryRegex = /(^[ \t]*)(\/\/\s*\^\?)/gm;
 const twoSlashArrowQueryRegex = /(^.*)\/\/=>/gm;
 
-export async function fillTwoSlashQueries(
-  sandbox: Sandbox,
-  isUndoRedoChange: boolean = false,
-): Promise<void> {
+export async function fillTwoSlashQueries(sandbox: Sandbox): Promise<void> {
   const multilineEnabled =
     localStorage.getItem("shareable-twoslash-comments/enable-multiline-comments") === "true";
   const truncationDisabled =
@@ -216,21 +213,7 @@ export async function fillTwoSlashQueries(
   }
 
   if (editOperations.length > 0) {
-    if (!isUndoRedoChange) {
-      model.popStackElement();
-    }
-
-    try {
-      if (isUndoRedoChange) {
-        model.applyEdits(editOperations);
-      } else {
-        sandbox.editor.executeEdits("shareable-twoslash-comments", editOperations);
-      }
-    } finally {
-      if (!isUndoRedoChange) {
-        model.pushStackElement();
-      }
-    }
+    model.applyEdits(editOperations);
   }
 }
 
