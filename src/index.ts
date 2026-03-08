@@ -118,7 +118,7 @@ const makePlugin = (utils: PluginUtils) => {
         fillTwoSlashQueries(sandbox);
         model.onDidChangeContent((e) => {
           if (e.isRedoing || e.isUndoing) {
-            fillTwoSlashQueries(sandbox);
+            fillTwoSlashQueries(sandbox, true);
           } else {
             debouncedFillTwoSlashQueries(sandbox);
           }
