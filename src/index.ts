@@ -8,7 +8,7 @@ const makePlugin = (utils: PluginUtils) => {
     id: "shareable-twoslash-comments",
     displayName: "Shareable Twoslash Comments",
     data: { firstMount: true },
-    shouldBeSelected: () => false,
+    shouldBeSelected: () => true,
     didMount: (sandbox, container) => {
       container.style.paddingRight = "8px";
 
